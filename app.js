@@ -1,9 +1,13 @@
 const express = require('express');
 const app = express();
-const index = require('./views/index.js');
+// const index = require('./views/index.js');
 const morgan = require('morgan');
 const path = require('path');
 const models = require('./models');
+const wikiRouter = require('./routes/wiki');
+const userRouter = require('./routes/user');
+
+app.use(express.urlencoded());
 
 models.db.authenticate().
 then(() => {
@@ -14,13 +18,17 @@ app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
  
 app.get('/', (req, res) => {
-    res.send(index.main());
+    res.redirect('/wiki');
 });
+
+app.use('/wiki', wikiRouter);
+app.use('/user', userRouter);
 
 const init = async () => {
     await models.User.sync();
     await models.Page.sync();
-
+    // drops the old tables and creates new ones if there were any changes made
+    models.db.sync({force: true});
     const PORT = 1337;
     app.listen(PORT, () => {
         console.log('starting')
