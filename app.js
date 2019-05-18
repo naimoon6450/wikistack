@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/wiki', wikiRouter);
-app.use('/user', userRouter);
+app.use('/users', userRouter);
 
 const init = async () => {
     await User.sync();
